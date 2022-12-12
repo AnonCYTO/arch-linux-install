@@ -58,15 +58,16 @@ grub-mkconfig -o /boot/grub/grub.cfg
 pacman -S --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbacklight xorg-xprop \
      noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono ttf-joypixels ttf-font-awesome \
      sxiv mpv zathura zathura-pdf-mupdf ffmpeg imagemagick  \
-     fzf man-db xwallpaper python-pywal youtube-dl unclutter xclip maim \
+     fzf man-db xwallpaper python-pywal unclutter xclip maim \
      zip unzip unrar p7zip xdotool papirus-icon-theme brightnessctl  \
      dosfstools ntfs-3g git sxhkd zsh pipewire pipewire-pulse \
-     vim emacs arc-gtk-theme rsync firefox dash \
-     xcompmgr libnotify dunst slock jq \
-     dhcpcd networkmanager rsync pamixer \
-     zsh-syntax-highlighting xdg-user-dirs
+     emacs-nox arc-gtk-theme rsync qutebrowser dash \
+     xcompmgr libnotify dunst slock jq aria2 cowsay \
+     dhcpcd connman wpa_supplicant rsync pamixer mpd ncmpcpp \
+     zsh-syntax-highlighting xdg-user-dirs libconfig \
+     bluez bluez-utils
 
-systemctl enable NetworkManager.service 
+systemctl enable connman.service 
 rm /bin/sh
 ln -s dash /bin/sh
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -88,17 +89,33 @@ cd $HOME
 git clone --separate-git-dir=$HOME/.dotfiles https://github.com/bugswriter/dotfiles.git tmpdotfiles
 rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
 rm -r tmpdotfiles
+# dwm: Window Manager
 git clone --depth=1 https://github.com/Bugswriter/dwm.git ~/.local/src/dwm
 sudo make -C ~/.local/src/dwm install
+
+# st: Terminal
 git clone --depth=1 https://github.com/Bugswriter/st.git ~/.local/src/st
 sudo make -C ~/.local/src/st install
+
+# dmenu: Program Menu
 git clone --depth=1 https://github.com/Bugswriter/dmenu.git ~/.local/src/dmenu
 sudo make -C ~/.local/src/dmenu install
-git clone --depth=1  https://aur.archlinux.org/paru.git ~/.local/src/paru
-cd ~/.local/src/paru
-makepkg -si
+
+# dmenu: Dmenu based Password Prompt
+git clone --depth=1 https://github.com/ritze/pinentry-dmenu.git ~/.local/src/pinentry-dmenu
+sudo make -C ~/.local/src/pinentry-dmenu clean install
+
+# dwmblocks: Status bar for dwm
+git clone --depth=1 https://github.com/bugswriter/dwmblocks.git ~/.local/src/dwmblocks
+sudo make -C ~/.local/src/dwmblocks install
+
+# pikaur: AUR helper
+git clone https://aur.archlinux.org/pikaur.git
+cd pikaur
+makepkg -fsri
 cd
-paru -S libxft-bgra-git
+pikaur -S libxft-bgra-git yt-dlp-drop-in
+mkdir dl dox imp music pix pub code
 
 ln -s ~/.config/x11/xinitrc .xinitrc
 ln -s ~/.config/shell/profile .zprofile
